@@ -11,16 +11,16 @@
      <v-list class="pt-0" subheader>
       <v-subheader>Account</v-subheader>
       <v-list-tile
-        v-for="item in items"
-        :key="item.title"
-        @click=""
+        v-for="drawerItem in drawerItems"
+        :key="drawerItem.title"
+        :to="drawerItem.to"
       >
         <v-list-tile-action>
-          <v-icon>{{ item.icon }}</v-icon>
+          <v-icon>{{ drawerItem.icon }}</v-icon>
         </v-list-tile-action>
 
         <v-list-tile-content>
-          <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          <v-list-tile-title>{{ drawerItem.title }}</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
@@ -30,17 +30,17 @@
      <v-list subheader>
           <v-subheader>Classes</v-subheader>
           <v-list-tile
-            v-for="drawerItem in drawerItems"
-            :key="drawerItem.title"
-            @click=""
+            v-for="teamItem in teamItems"
+            :key="teamItem.title"
+            :to="teamItem.to"
             avatar
           >
-            <v-list-tile-avatar>
-              <img :src="drawerItem.avatar">
-            </v-list-tile-avatar>
+            <!-- <v-list-tile-avatar>
+              <img :src="teamItem.avatar">
+            </v-list-tile-avatar> -->
 
             <v-list-tile-content>
-              <v-list-tile-title v-html="drawerItem.title"></v-list-tile-title>
+              <v-list-tile-title v-html="teamItem.teamName"></v-list-tile-title>
             </v-list-tile-content>
 
           </v-list-tile>
@@ -48,148 +48,89 @@
 
     </v-navigation-drawer>
 
-    <v-toolbar app absolute tabs>
+    <v-toolbar app absolute>
       <v-toolbar-side-icon
         @click.stop="primaryDrawer.model = !primaryDrawer.model"
       ></v-toolbar-side-icon>
       <v-toolbar-title>SAM Evolution</v-toolbar-title>
-      <template v-slot:extension>
-        <v-tabs
-          v-model="tabs"
-          fixed-tabs
-          color="transparent"
-        >
-          <v-tabs-slider></v-tabs-slider>
-          
-          <v-tab
-            v-for="navItem in navItems"
-            :key="navItem"
-          >
-            {{ navItem }}
-          </v-tab>
-        </v-tabs>
-      </template>
+      
     </v-toolbar>
 
     <v-content>
-      <v-container fluid>
-        <!-- <v-layout align-center justify-center> -->
-          <!-- <v-flex xs10>
-            <v-card>
-              <h1>Hello</h1>
-            </v-card>
-          </v-flex> -->
+      <v-container fluid class="pa-0">
 
-          <!-- Calendars -->
-          <!-- Hello -->
-
-
-        <!-- </v-layout> -->
-
-
-        <v-layout wrap>
-          <v-flex
-            xs12
-            class="mb-3"
-          >
-            <v-sheet height="500">
-              <v-calendar
-                ref="calendar"
-                v-model="start"
-                :type="type"
-                :end="end"
-                color="primary"
-              ></v-calendar>
-            </v-sheet>
-          </v-flex>
-
-          <v-flex
-            sm4
-            xs12
-            class="text-sm-left text-xs-center"
-          >
-            <v-btn @click="$refs.calendar.prev()">
-              <v-icon
-                dark
-                left
-              >
-                keyboard_arrow_left
-              </v-icon>
-              Prev
-            </v-btn>
-          </v-flex>
-          <v-flex
-            sm4
-            xs12
-            class="text-xs-center"
-          >
-            <v-select
-              v-model="type"
-              :items="typeOptions"
-              label="Type"
-            ></v-select>
-          </v-flex>
-          <v-flex
-            sm4
-            xs12
-            class="text-sm-right text-xs-center"
-          >
-            <v-btn @click="$refs.calendar.next()">
-              Next
-              <v-icon
-                right
-                dark
-              >
-                keyboard_arrow_right
-              </v-icon>
-            </v-btn>
-          </v-flex>
-        </v-layout>
-
+        <router-view></router-view>
 
       </v-container>
     </v-content>
-    <v-footer inset app>
+    <!-- <v-footer inset app>
       <span class="px-3">&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
+    </v-footer> -->
+    <loginDialog ref="loginDialog" @loginSuccess="globalInit"></loginDialog>
   </v-app>
 </template>
 
 <script>
-  export default {
+
+import loginDialog from './components/LoginDialog';
+
+export default {
     data: () => ({
       primaryDrawer: {
         model: null,
       },
-      navItems: [
-        'home', 'homework', 'calendars', 'forms', 'reservations'
-      ],
       tabs: null,
+      teamItems: [],
       drawerItems: [
-        { active: true, title: 'Math Wade', avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg' },
-        { active: true, title: 'Math HLC 12th Grade', avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg' },
-        { title: 'Chemistry SL 12th Grade', avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg' },
-        { title: 'Physics HL 12th Grade', avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg' }
-      ],
-      items: [
-          { title: 'Home', icon: 'dashboard' },
-          { title: 'About', icon: 'question_answer' }
+          { title: 'Home', icon: 'dashboard', to: '/' },
+          { title: 'Calendar', icon: 'dashboard', to: '/calendar' },
+          { title: 'Files', icon: 'dashboard', to: '/file' },
+          { title: 'Forms', icon: 'dashboard', to: '/form' },
+          { title: 'Reservations', icon: 'dashboard', to: '/reservation' }
         ],
       right: null,
-
-      //calendars
-      type: 'month',
-      start: '2019-01-01',
-      end: '2019-01-06',
-      typeOptions: [
-        { text: 'Day', value: 'day' },
-        { text: '4 Day', value: '4day' },
-        { text: 'Week', value: 'week' },
-        { text: 'Month', value: 'month' },
-        { text: 'Custom Daily', value: 'custom-daily' },
-        { text: 'Custom Weekly', value: 'custom-weekly' }
-      ]
       
-    })
+    }),
+    mounted: function () {
+      this.$axios
+        .get('api/v1/user')
+        .then((response) => {
+          let data = response.data;
+            let status = data.status;
+            if(status == 0){
+              this.showLoginDialog();
+            }else{
+              this.globalInit();
+            }
+        });
+
+    },
+    methods: {
+      showLoginDialog () {
+        this.$refs.loginDialog.showLoginDialog();
+      },
+      globalInit () {
+        // alert('Login Success');
+        this.$axios
+        .get('api/v1/init')
+        .then((response) => {
+          let data = response.data;
+          console.log(data);
+          for(let team of data){
+            this.teamItems.push({
+              teamName: team.team_name,
+              id: team.id,
+              to: '/team/'+team.id+'/'
+            })
+          }
+        });
+      },
+      // loadTeam (teamId) {
+        // alert(teamId);
+      // }
+    },
+    components:{
+      loginDialog
+    }
   }
 </script>
