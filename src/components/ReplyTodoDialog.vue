@@ -4,7 +4,7 @@
 
             <v-card>
                 <v-card-title class="headline grey lighten-2" primary-title>
-                    Add a Member to This Team
+                    Submit a Homework
                 </v-card-title>
 
                 <v-card-text>
@@ -42,31 +42,59 @@
     export default {
         data() {
             return {
-                replyTodoDialog: false,
-                todoId: null,
-                teamId: this.$route.params.id
+                fileId: null,
+                content: null,
+                replyId: NaN
             };
+        },
+        computed: {
+            replyTodoDialog: {
+                get() {
+                    return this.$store.state.replyTodoDialog
+                },
+                set(value) {
+                    this.$store.commit('closeReplyDialog')
+                }
+            },
+            todoId() {
+                return this.$store.state.todoId
+            },
+            teamId() {
+                return this.$store.state.teamId
+            }
+
         },
         methods: {
             submit() {
-                this.$axios.post('http://localhost/api/v1/team/'+this.teamId+'/file/'+this.fileId+'/toggle', {
-                        
+                this.$axios.post('http://localhost/api/v1/team/' + this.teamId + '/todo/' + this.todoId + '/reply', {
+                        reply_content: this.content
                     })
                     .then((response) => {
-                        // console.log(response.status);
+                        console.log(response);
                         let data = response.data;
-                        if (data.status == 1) {
-                            this.replyTodoDialog = false;
-                            this.$emit('toggleMemberSuccess');
-                        } else {
-                            alert('Share Member Failed.');
-                            console.log(data);
+                        this.replyId = data.id;
+                        console.log(data.id);
+                        // if (data.status == 1) {
+                        // } else {
+                        // alert('Create Reply Failed.');
+                        // console.log(data);
+                        // }
+                        if (this.fileId) {
+                            this.$axios.post('http://localhost/api/v1/reply/' + this.replyId + '/file/' + this.fileId +
+                                    '/toggle', {})
+                                .then((response) => {
+                                    console.log(response);
+                                    let data = response.data;
+                                    this.replyTodoDialog = false;
+
+                                });
                         }
-                    })
+                    });
+                // console.log(this.replyId);
             }
         },
-        props: [
-            'replyTodoDialog', 'todoId'
-        ]
+        // props: [
+        //     'replyTodoDialog', 'todoId'
+        // ]
     };
 </script>

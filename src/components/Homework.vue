@@ -31,6 +31,7 @@
 
     <v-card-actions>
         <v-btn flat color="blue" @click="showReplyDialog(homework.id)">Submit</v-btn>
+        <v-btn flat color="blue" @click="showReplyListDialog()">All Replies</v-btn>
     </v-card-actions>
 </v-card>
 </template>
@@ -41,9 +42,11 @@ export default {
         
     }),
     methods: {
-      showReplyDialog (todoId) {
-        let data = {todoId: todoId};
-        this.$emit('showReplyDialog', data);
+      showReplyDialog () {
+        this.$store.commit('showReplyDialog', this.homework);
+      },
+      showReplyListDialog () {
+        this.$store.commit('showReplyListDialog', this.homework);
       }
     },
     props: [
